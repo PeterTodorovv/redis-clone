@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"redis/request"
+	requesthandler "redis/request_handler"
 )
 
 func main() {
@@ -19,9 +20,10 @@ func main() {
 
 		if err != nil {
 			fmt.Println(err)
+			continue
 		}
 
-		_, err = request.RequestFromReader(connection)
+		req, err := request.RequestFromReader(connection)
 
 		if err != nil {
 			fmt.Println(err)
@@ -29,7 +31,15 @@ func main() {
 			continue
 		}
 
-		connection.Write([]byte("success"))
+		response, err := requesthandler.HandleRequest(*req)
+
+		if err != nil {
+			fmt.Println(err)
+			connection.Write([]byte(err.Error()))
+			continue
+		}
+
+		connection.Write([]byte(response))
 	}
 
 }

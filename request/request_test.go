@@ -35,4 +35,10 @@ func TestRequestParsing(t *testing.T) {
 	assert.Equal(t, request.args[0], "name")
 	assert.Equal(t, request.args[1], "Peter")
 	assert.Len(t, request.args, 2)
+
+	reader = Reader{data: "*1\r\n$4\r\nPING\r\n"}
+	request, _ = RequestFromReader(&reader)
+	assert.Equal(t, request.command, "PING")
+	assert.Len(t, request.args, 0)
+
 }

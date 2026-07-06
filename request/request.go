@@ -13,8 +13,48 @@ type Request struct {
 	args    []string
 }
 
-const invlaid_prefix = "Expected prefix %q, got %q"
+func (r Request) GetCommand() string {
+	return r.command
+}
 
+func (r Request) GetArgs() []string {
+	return r.args
+}
+
+const invalid_prefix = "Expected prefix %q, got %q"
+
+func RequestFromReader(reader io.Reader) (*Request, error) {
+	buffered := bufio.NewReader(reader)
+
+	count, err := readLength(buffered, '*')
+	if err != nil {
+		return nil, err
+	}
+
+	command, err := readNext(buffered)
+
+	if err != nil {
+		return nil, err
+	}
+
+	count--
+	args := make([]string, count)
+	for i := 0; i < count; i++ {
+		arg, err := readNext(buffered)
+
+		if err != nil {
+			return nil, err
+		}
+
+		args[i] = arg
+	}
+
+	return CreateRequest(command, args), nil
+}
+
+func CreateRequest(c string, a []string) *Request {
+	return &Request{command: c, args: a}
+}
 func readLength(reader *bufio.Reader, prefix byte) (int, error) {
 	line, err := reader.ReadString('\n')
 	if err != nil {
@@ -23,7 +63,7 @@ func readLength(reader *bufio.Reader, prefix byte) (int, error) {
 
 	line = strings.TrimSpace(line)
 	if len(line) == 0 || line[0] != prefix {
-		return 0, fmt.Errorf(invlaid_prefix, prefix, line)
+		return 0, fmt.Errorf(invalid_prefix, prefix, line)
 	}
 
 	return strconv.Atoi(line[1:])
@@ -41,33 +81,4 @@ func readNext(reader *bufio.Reader) (string, error) {
 		return "", err
 	}
 	return string(buffer[:size]), err
-}
-
-func RequestFromReader(reader io.Reader) (*Request, error) {
-	buffered := bufio.NewReader(reader)
-
-	count, err := readLength(buffered, '*')
-	if err != nil {
-		return nil, err
-	}
-
-	request := &Request{}
-	command, err := readNext(buffered)
-
-	if err != nil {
-		return nil, err
-	}
-
-	request.command = command
-	for i := 1; i < count; i++ {
-		arg, err := readNext(buffered)
-
-		if err != nil {
-			return nil, err
-		}
-
-		request.args = append(request.args, arg)
-	}
-
-	return request, nil
 }
