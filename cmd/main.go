@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"net"
+	"redis/database"
 	"redis/request"
 	requesthandler "redis/request_handler"
 )
 
 func main() {
 	listener, err := net.Listen("tcp", ":4200")
+	db := database.CreateDatabase()
+
 	if err != nil {
 		panic(err)
 	}
@@ -23,23 +26,30 @@ func main() {
 			continue
 		}
 
+		handleConnection(connection, *db)
+	}
+}
+
+func handleConnection(connection net.Conn, db database.Database) {
+
+	defer connection.Close()
+	for {
 		req, err := request.RequestFromReader(connection)
 
 		if err != nil {
 			fmt.Println(err)
 			connection.Write([]byte(err.Error()))
-			continue
+			return
 		}
 
-		response, err := requesthandler.HandleRequest(*req)
+		response, err := requesthandler.HandleRequest(*req, db)
 
 		if err != nil {
 			fmt.Println(err)
 			connection.Write([]byte(err.Error()))
-			continue
+			return
 		}
 
 		connection.Write([]byte(response))
 	}
-
 }

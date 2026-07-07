@@ -2,6 +2,7 @@ package requesthandler
 
 import (
 	"fmt"
+	"redis/database"
 	"redis/request"
 	"strings"
 )
@@ -19,10 +20,16 @@ const (
 	UNKNOWN_COMMAND = "ERR unknown command"
 )
 
-func HandleRequest(r request.Request) (string, error) {
+func HandleRequest(r request.Request, db database.Database) (string, error) {
 	switch strings.ToUpper(r.GetCommand()) {
 	case PING:
 		return simpleFormat(ping()), nil
+	case SET:
+		response, err := db.Set(r)
+		if err != nil {
+			return errorFormat(err.Error()), nil
+		}
+		return simpleFormat(response), nil
 	default:
 		return errorFormat(UNKNOWN_COMMAND), nil
 	}
