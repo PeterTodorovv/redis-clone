@@ -30,6 +30,12 @@ func HandleRequest(r request.Request, db database.Database) (string, error) {
 			return errorFormat(err.Error()), nil
 		}
 		return simpleFormat(response), nil
+	case GET:
+		response, err := db.Get(r)
+		if err != nil {
+			return errorFormat(err.Error()), nil
+		}
+		return lenFormat(response), nil
 	default:
 		return errorFormat(UNKNOWN_COMMAND), nil
 	}
@@ -41,6 +47,13 @@ func ping() string {
 
 func simpleFormat(r string) string {
 	return fmt.Sprintf("+%s\r\n", r)
+}
+
+func lenFormat(r database.StringValue) string {
+	if r == "" {
+		return "$-1\r\n"
+	}
+	return fmt.Sprintf("$%d\r\n%s\r\n", len(r), r)
 }
 
 func errorFormat(err string) string {

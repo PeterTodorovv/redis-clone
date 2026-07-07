@@ -25,7 +25,8 @@ func (s StringValue) GetType() string {
 }
 
 const (
-	ok = "OK"
+	ok        = "OK"
+	not_found = ""
 )
 
 func (db *Database) Set(r request.Request) (string, error) {
@@ -46,8 +47,23 @@ func (db *Database) Set(r request.Request) (string, error) {
 	return ok, nil
 }
 
+func (db *Database) Get(r request.Request) (StringValue, error) {
+	value, ok := db.data[r.GetArgs()[0]]
+	if ok == false {
+		return "", nil
+	}
+
+	val, err := value.(StringValue)
+
+	if err == false {
+		return "", nil
+	}
+
+	return val, nil
+}
+
 func getSetArguments(args []string) (string, StringValue, error) {
-	if len(args) < 2 {
+	if len(args) != 2 {
 		return "", "", fmt.Errorf("Missing key or value parameters")
 	}
 
