@@ -42,14 +42,7 @@ func handleConnection(connection net.Conn, db database.Database) {
 			return
 		}
 
-		response, err := requesthandler.HandleRequest(*req, db)
-
-		if err != nil {
-			fmt.Println(err)
-			connection.Write([]byte(err.Error()))
-			return
-		}
-
+		response := requesthandler.HandleRequest(*req, db)
 		connection.Write([]byte(response))
 	}
 }

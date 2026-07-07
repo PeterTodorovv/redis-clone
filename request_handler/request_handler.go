@@ -20,24 +20,34 @@ const (
 	UNKNOWN_COMMAND = "ERR unknown command"
 )
 
-func HandleRequest(r request.Request, db database.Database) (string, error) {
+func HandleRequest(r request.Request, db database.Database) string {
 	switch strings.ToUpper(r.GetCommand()) {
 	case PING:
-		return simpleFormat(ping()), nil
+		return simpleFormat(ping())
 	case SET:
-		response, err := db.Set(r)
+		key, value, err := getSetArguments(r.GetArgs())
 		if err != nil {
-			return errorFormat(err.Error()), nil
+			return errorFormat(err.Error())
 		}
-		return simpleFormat(response), nil
+
+		response, err := db.Set(key, value)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+		return simpleFormat(response)
 	case GET:
-		response, err := db.Get(r)
+		key, err := getGetKey(r.GetArgs())
 		if err != nil {
-			return errorFormat(err.Error()), nil
+			return errorFormat(err.Error())
 		}
-		return lenFormat(response), nil
+
+		response, err := db.Get(key)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+		return lenFormat(response)
 	default:
-		return errorFormat(UNKNOWN_COMMAND), nil
+		return errorFormat(UNKNOWN_COMMAND)
 	}
 }
 
@@ -58,4 +68,19 @@ func lenFormat(r database.StringValue) string {
 
 func errorFormat(err string) string {
 	return fmt.Sprintf("-%s\r\n", err)
+}
+
+func getSetArguments(args []string) (string, database.StringValue, error) {
+	if len(args) != 2 {
+		return "", "", fmt.Errorf("Missing key or value parameters")
+	}
+
+	return args[0], database.StringValue(args[1]), nil
+}
+
+func getGetKey(args []string) (string, error) {
+	if len(args) == 0 {
+		return "", fmt.Errorf("Missing get argument")
+	}
+	return args[0], nil
 }

@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"redis/request"
 )
 
 type Value interface {
@@ -29,13 +28,7 @@ const (
 	not_found = ""
 )
 
-func (db *Database) Set(r request.Request) (string, error) {
-
-	key, value, err := getSetArguments(r.GetArgs())
-	if err != nil {
-		return "", err
-	}
-
+func (db *Database) Set(key string, value StringValue) (string, error) {
 	_, exists := db.data[key]
 
 	if exists {
@@ -47,8 +40,8 @@ func (db *Database) Set(r request.Request) (string, error) {
 	return ok, nil
 }
 
-func (db *Database) Get(r request.Request) (StringValue, error) {
-	value, ok := db.data[r.GetArgs()[0]]
+func (db *Database) Get(key string) (StringValue, error) {
+	value, ok := db.data[key]
 	if ok == false {
 		return "", nil
 	}
