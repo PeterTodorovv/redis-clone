@@ -23,15 +23,13 @@ func (r Request) GetArgs() []string {
 
 const invalidPrefix = "Expected prefix %q, got %q"
 
-func RequestFromReader(reader io.Reader) (*Request, error) {
-	buffered := bufio.NewReader(reader)
-
-	count, err := readLength(buffered, '*')
+func RequestFromReader(reader *bufio.Reader) (*Request, error) {
+	count, err := readLength(reader, '*')
 	if err != nil {
 		return nil, err
 	}
 
-	command, err := readNext(buffered)
+	command, err := readNext(reader)
 
 	if err != nil {
 		return nil, err
@@ -40,7 +38,7 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 	count--
 	args := make([]string, count)
 	for i := 0; i < count; i++ {
-		arg, err := readNext(buffered)
+		arg, err := readNext(reader)
 
 		if err != nil {
 			return nil, err

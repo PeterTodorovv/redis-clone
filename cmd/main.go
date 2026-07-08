@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net"
 	"redis/database"
 	"redis/request"
@@ -33,8 +35,14 @@ func main() {
 func handleConnection(connection net.Conn, db *database.Database) {
 
 	defer connection.Close()
+	buffered := bufio.NewReader(connection)
+
 	for {
-		req, err := request.RequestFromReader(connection)
+		req, err := request.RequestFromReader(buffered)
+
+		if err == io.EOF {
+			return
+		}
 
 		if err != nil {
 			fmt.Println(err)
