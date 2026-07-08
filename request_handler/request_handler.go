@@ -8,23 +8,23 @@ import (
 )
 
 const (
-	PING   = "PING"
-	SET    = "SET"
-	GET    = "GET"
-	DEL    = "DEL"
-	EXISTS = "EXISTS"
-	ECHO   = "ECHO"
+	cmdPing   = "PING"
+	cmdSet    = "SET"
+	cmdGet    = "GET"
+	cmdDel    = "DEL"
+	cmdExists = "EXISTS"
+	cmdEcho   = "ECHO"
 )
 
 const (
-	UNKNOWN_COMMAND = "ERR unknown command"
+	unknownCommand = "ERR unknown command"
 )
 
-func HandleRequest(r request.Request, db database.Database) string {
+func HandleRequest(r request.Request, db *database.Database) string {
 	switch strings.ToUpper(r.GetCommand()) {
-	case PING:
+	case cmdPing:
 		return simpleFormat(ping())
-	case SET:
+	case cmdSet:
 		key, value, err := getSetArguments(r.GetArgs())
 		if err != nil {
 			return errorFormat(err.Error())
@@ -35,19 +35,19 @@ func HandleRequest(r request.Request, db database.Database) string {
 			return errorFormat(err.Error())
 		}
 		return simpleFormat(response)
-	case GET:
+	case cmdGet:
 		key, err := getGetKey(r.GetArgs())
 		if err != nil {
 			return errorFormat(err.Error())
 		}
 
-		response, err := db.Get(key)
+		response, found, err := db.Get(key)
 		if err != nil {
 			return errorFormat(err.Error())
 		}
-		return lenFormat(response)
+		return lenFormat(response, found)
 	default:
-		return errorFormat(UNKNOWN_COMMAND)
+		return errorFormat(unknownCommand)
 	}
 }
 
@@ -59,8 +59,8 @@ func simpleFormat(r string) string {
 	return fmt.Sprintf("+%s\r\n", r)
 }
 
-func lenFormat(r database.StringValue) string {
-	if r == "" {
+func lenFormat(r database.StringValue, found bool) string {
+	if !found {
 		return "$-1\r\n"
 	}
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(r), r)

@@ -21,7 +21,7 @@ func (r Request) GetArgs() []string {
 	return r.args
 }
 
-const invalid_prefix = "Expected prefix %q, got %q"
+const invalidPrefix = "Expected prefix %q, got %q"
 
 func RequestFromReader(reader io.Reader) (*Request, error) {
 	buffered := bufio.NewReader(reader)
@@ -63,7 +63,7 @@ func readLength(reader *bufio.Reader, prefix byte) (int, error) {
 
 	line = strings.TrimSpace(line)
 	if len(line) == 0 || line[0] != prefix {
-		return 0, fmt.Errorf(invalid_prefix, prefix, line)
+		return 0, fmt.Errorf(invalidPrefix, prefix, line)
 	}
 
 	return strconv.Atoi(line[1:])

@@ -26,11 +26,11 @@ func main() {
 			continue
 		}
 
-		handleConnection(connection, *db)
+		handleConnection(connection, db)
 	}
 }
 
-func handleConnection(connection net.Conn, db database.Database) {
+func handleConnection(connection net.Conn, db *database.Database) {
 
 	defer connection.Close()
 	for {

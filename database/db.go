@@ -1,8 +1,6 @@
 package database
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Value interface {
 	GetType() string
@@ -24,41 +22,26 @@ func (s StringValue) GetType() string {
 }
 
 const (
-	ok        = "OK"
-	not_found = ""
+	ok = "OK"
 )
 
 func (db *Database) Set(key string, value StringValue) (string, error) {
-	_, exists := db.data[key]
-
-	if exists {
-		return "", fmt.Errorf("Key %s already exists", key)
-	}
-
 	db.data[key] = value
 
 	return ok, nil
 }
 
-func (db *Database) Get(key string) (StringValue, error) {
+func (db *Database) Get(key string) (StringValue, bool, error) {
 	value, ok := db.data[key]
-	if ok == false {
-		return "", nil
+	if !ok {
+		return "", false, nil
 	}
 
-	val, err := value.(StringValue)
+	val, ok := value.(StringValue)
 
-	if err == false {
-		return "", nil
+	if !ok {
+		return "", true, fmt.Errorf("Wrong datatype.")
 	}
 
-	return val, nil
-}
-
-func getSetArguments(args []string) (string, StringValue, error) {
-	if len(args) != 2 {
-		return "", "", fmt.Errorf("Missing key or value parameters")
-	}
-
-	return args[0], StringValue(args[1]), nil
+	return val, true, nil
 }
