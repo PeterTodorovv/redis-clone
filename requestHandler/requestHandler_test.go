@@ -1,4 +1,4 @@
-package requesthandler
+package requestHandler
 
 import (
 	"redis/database"

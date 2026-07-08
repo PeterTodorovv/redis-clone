@@ -7,7 +7,7 @@ import (
 	"net"
 	"redis/database"
 	"redis/request"
-	requesthandler "redis/request_handler"
+	"redis/requestHandler"
 )
 
 func main() {
@@ -50,7 +50,7 @@ func handleConnection(connection net.Conn, db *database.Database) {
 			return
 		}
 
-		response := requesthandler.HandleRequest(*req, db)
+		response := requestHandler.HandleRequest(*req, db)
 		connection.Write([]byte(response))
 	}
 }
