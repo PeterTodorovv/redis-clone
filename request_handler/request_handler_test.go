@@ -60,4 +60,16 @@ func TestRequestHandler(t *testing.T) {
 	req = request.CreateRequest("del", []string{"name"})
 	res = HandleRequest(*req, db)
 	assert.Equal(t, res, ":0\r\n")
+
+	req = request.CreateRequest("get", []string{"name", "extra"})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, "-ERR wrong number of arguments for 'GET' command\r\n")
+
+	req = request.CreateRequest("echo", []string{"a", "b"})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, "-ERR wrong number of arguments for 'ECHO' command\r\n")
+
+	req = request.CreateRequest("echo", []string{})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, "-ERR wrong number of arguments for 'ECHO' command\r\n")
 }

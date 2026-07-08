@@ -60,7 +60,7 @@ func HandleRequest(r request.Request, db *database.Database) string {
 		deleted := db.Del(r.GetArgs())
 		return numberFormat(deleted)
 	case cmdEcho:
-		if len(r.GetArgs()) == 0 {
+		if len(r.GetArgs()) != 1 {
 			return errorFormat(fmt.Sprintf(wrongNumberOfArguments, cmdEcho))
 		}
 		return bulkFormat(r.GetArgs()[0], true)
@@ -100,7 +100,7 @@ func getKeyValueArguments(args []string) (string, database.StringValue, error) {
 }
 
 func getKeyArgument(args []string) (string, error) {
-	if len(args) == 0 {
+	if len(args) != 1 {
 		return "", fmt.Errorf(wrongNumberOfArguments, cmdGet)
 	}
 	return args[0], nil
