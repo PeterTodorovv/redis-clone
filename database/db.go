@@ -59,3 +59,14 @@ func (db *Database) Exists(keys []string) int {
 
 	return found
 }
+
+func (db *Database) Del(keys []string) int {
+	deleted := 0
+	for _, key := range keys {
+		if _, ok := db.data[key]; ok {
+			delete(db.data, key)
+			deleted++
+		}
+	}
+	return deleted
+}
