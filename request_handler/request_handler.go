@@ -46,7 +46,7 @@ func HandleRequest(r request.Request, db *database.Database) string {
 		if err != nil {
 			return errorFormat(err.Error())
 		}
-		return lenFormat(response, found)
+		return bulkFormat(string(response), found)
 	case cmdExists:
 		if len(r.GetArgs()) == 0 {
 			return errorFormat(fmt.Sprintf(wrongNumberOfArguments, cmdExists))
@@ -59,6 +59,11 @@ func HandleRequest(r request.Request, db *database.Database) string {
 		}
 		deleted := db.Del(r.GetArgs())
 		return numberFormat(deleted)
+	case cmdEcho:
+		if len(r.GetArgs()) == 0 {
+			return errorFormat(fmt.Sprintf(wrongNumberOfArguments, cmdEcho))
+		}
+		return bulkFormat(r.GetArgs()[0], true)
 	default:
 		return errorFormat(unknownCommand)
 	}
@@ -72,7 +77,7 @@ func simpleFormat(r string) string {
 	return fmt.Sprintf("+%s\r\n", r)
 }
 
-func lenFormat(r database.StringValue, found bool) string {
+func bulkFormat(r string, found bool) string {
 	if !found {
 		return "$-1\r\n"
 	}
@@ -88,7 +93,7 @@ func errorFormat(err string) string {
 
 func getSetArguments(args []string) (string, database.StringValue, error) {
 	if len(args) != 2 {
-		return "", "", fmt.Errorf(wrongNumberOfArguments, cmdGet)
+		return "", "", fmt.Errorf(wrongNumberOfArguments, cmdSet)
 	}
 
 	return args[0], database.StringValue(args[1]), nil
@@ -96,7 +101,7 @@ func getSetArguments(args []string) (string, database.StringValue, error) {
 
 func getGetKey(args []string) (string, error) {
 	if len(args) == 0 {
-		return "", fmt.Errorf("Missing get argument")
+		return "", fmt.Errorf(wrongNumberOfArguments, cmdGet)
 	}
 	return args[0], nil
 }
