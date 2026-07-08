@@ -46,6 +46,9 @@ func HandleRequest(r request.Request, db *database.Database) string {
 			return errorFormat(err.Error())
 		}
 		return lenFormat(response, found)
+	case cmdExists:
+		found := db.Exists(r.GetArgs())
+		return existsFormat(found)
 	default:
 		return errorFormat(unknownCommand)
 	}
@@ -66,6 +69,9 @@ func lenFormat(r database.StringValue, found bool) string {
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(r), r)
 }
 
+func existsFormat(count int) string {
+	return fmt.Sprintf(":%d\r\n", count)
+}
 func errorFormat(err string) string {
 	return fmt.Sprintf("-%s\r\n", err)
 }

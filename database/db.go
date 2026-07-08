@@ -45,3 +45,17 @@ func (db *Database) Get(key string) (StringValue, bool, error) {
 
 	return val, true, nil
 }
+
+func (db *Database) Exists(keys []string) int {
+	found := 0
+
+	for _, key := range keys {
+		_, ok := db.data[key]
+
+		if ok {
+			found++
+		}
+	}
+
+	return found
+}

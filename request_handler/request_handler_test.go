@@ -36,4 +36,16 @@ func TestRequestHandler(t *testing.T) {
 	req = request.CreateRequest("get", []string{"age"})
 	res = HandleRequest(*req, db)
 	assert.Equal(t, res, "$-1\r\n")
+
+	req = request.CreateRequest("exists", []string{"age"})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, ":0\r\n")
+
+	req = request.CreateRequest("exists", []string{"name"})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, ":1\r\n")
+
+	req = request.CreateRequest("exists", []string{"name", "name"})
+	res = HandleRequest(*req, db)
+	assert.Equal(t, res, ":2\r\n")
 }
