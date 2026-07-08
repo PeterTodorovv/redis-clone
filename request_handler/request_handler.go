@@ -18,7 +18,7 @@ const (
 
 const (
 	unknownCommand         = "ERR unknown command"
-	wrongNumberOfArguments = "ERR wrong number of arguments for '%q' command"
+	wrongNumberOfArguments = "ERR wrong number of arguments for '%s' command"
 )
 
 func HandleRequest(r request.Request, db *database.Database) string {
@@ -26,7 +26,7 @@ func HandleRequest(r request.Request, db *database.Database) string {
 	case cmdPing:
 		return simpleFormat(ping())
 	case cmdSet:
-		key, value, err := getSetArguments(r.GetArgs())
+		key, value, err := getKeyValueArguments(r.GetArgs())
 		if err != nil {
 			return errorFormat(err.Error())
 		}
@@ -37,7 +37,7 @@ func HandleRequest(r request.Request, db *database.Database) string {
 		}
 		return simpleFormat(response)
 	case cmdGet:
-		key, err := getGetKey(r.GetArgs())
+		key, err := getKeyArgument(r.GetArgs())
 		if err != nil {
 			return errorFormat(err.Error())
 		}
@@ -91,7 +91,7 @@ func errorFormat(err string) string {
 	return fmt.Sprintf("-%s\r\n", err)
 }
 
-func getSetArguments(args []string) (string, database.StringValue, error) {
+func getKeyValueArguments(args []string) (string, database.StringValue, error) {
 	if len(args) != 2 {
 		return "", "", fmt.Errorf(wrongNumberOfArguments, cmdSet)
 	}
@@ -99,7 +99,7 @@ func getSetArguments(args []string) (string, database.StringValue, error) {
 	return args[0], database.StringValue(args[1]), nil
 }
 
-func getGetKey(args []string) (string, error) {
+func getKeyArgument(args []string) (string, error) {
 	if len(args) == 0 {
 		return "", fmt.Errorf(wrongNumberOfArguments, cmdGet)
 	}
