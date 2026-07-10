@@ -3,13 +3,14 @@ package database
 import "fmt"
 
 const (
-	ok = "OK"
+	ok          = "OK"
+	stringConst = "string"
 )
 
 type StringValue string
 
 func (s StringValue) GetType() string {
-	return "string"
+	return stringConst
 }
 
 func (db *Database) Set(key string, value StringValue) (string, error) {

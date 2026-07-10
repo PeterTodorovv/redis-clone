@@ -14,6 +14,8 @@ const (
 	cmdDel    = "DEL"
 	cmdExists = "EXISTS"
 	cmdEcho   = "ECHO"
+
+	cmdRPush = "RPUSH"
 )
 
 const (
@@ -64,6 +66,18 @@ func HandleRequest(r request.Request, db *database.Database) string {
 			return errorFormat(fmt.Sprintf(wrongNumberOfArguments, cmdEcho))
 		}
 		return bulkFormat(r.GetArgs()[0], true)
+	case cmdRPush:
+		key, values, err := getKeyValuesArguments(r.GetArgs())
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		added, err := db.RPush(key, values)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		return numberFormat(added)
 	default:
 		return errorFormat(unknownCommand)
 	}
@@ -97,6 +111,14 @@ func getKeyValueArguments(args []string) (string, database.StringValue, error) {
 	}
 
 	return args[0], database.StringValue(args[1]), nil
+}
+
+func getKeyValuesArguments(args []string) (string, []string, error) {
+	if len(args) < 2 {
+		return "", nil, fmt.Errorf(wrongNumberOfArguments, cmdSet)
+	}
+
+	return args[0], args[1:], nil
 }
 
 func getKeyArgument(args []string) (string, error) {

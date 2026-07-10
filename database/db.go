@@ -1,5 +1,9 @@
 package database
 
+const (
+	wrongDatatype = "ERR Wrong datatype"
+)
+
 type Value interface {
 	GetType() string
 }
