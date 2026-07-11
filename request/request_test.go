@@ -27,25 +27,25 @@ func TestRequestParsing(t *testing.T) {
 	buffered := bufio.NewReader(&reader)
 	request, _ := RequestFromReader(buffered)
 
-	assert.Equal(t, request.command, "SET")
-	assert.Equal(t, request.args[0], "name")
-	assert.Equal(t, request.args[1], "Peter")
+	assert.Equal(t, "SET", request.command)
+	assert.Equal(t, "name", request.args[0])
+	assert.Equal(t, "Peter", request.args[1])
 	assert.Len(t, request.args, 2)
 
 	reader = Reader{data: "*3\r\n$3\r\nSET\r\n$4\r\nname\r\n$5\r\nPeter\r\n$5\r\nPeter\r\n"}
 	buffered = bufio.NewReader(&reader)
 	request, _ = RequestFromReader(buffered)
 
-	assert.Equal(t, request.command, "SET")
-	assert.Equal(t, request.args[0], "name")
-	assert.Equal(t, request.args[1], "Peter")
+	assert.Equal(t, "SET", request.command)
+	assert.Equal(t, "name", request.args[0])
+	assert.Equal(t, "Peter", request.args[1])
 	assert.Len(t, request.args, 2)
 
 	reader = Reader{data: "*1\r\n$4\r\nPING\r\n"}
 	buffered = bufio.NewReader(&reader)
 	request, _ = RequestFromReader(buffered)
 
-	assert.Equal(t, request.command, "PING")
+	assert.Equal(t, "PING", request.command)
 	assert.Len(t, request.args, 0)
 
 }
