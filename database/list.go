@@ -45,3 +45,17 @@ func (db *Database) LPush(key string, values []string) (int, error) {
 
 	return len(typeData), nil
 }
+
+func (db *Database) RPushX(key string, values []string) (int, error) {
+	if _, ok := db.data[key]; !ok {
+		return 0, nil
+	}
+	return db.RPush(key, values)
+}
+
+func (db *Database) LPushX(key string, values []string) (int, error) {
+	if _, ok := db.data[key]; !ok {
+		return 0, nil
+	}
+	return db.LPush(key, values)
+}
