@@ -2,6 +2,7 @@ package request
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -21,12 +22,19 @@ func (r Request) GetArgs() []string {
 	return r.args
 }
 
-const invalidPrefix = "Expected prefix %q, got %q"
+const (
+	invalidPrefix     = "Expected prefix %q, got %q"
+	invalidArrayCount = "Array count less or equal to 0 or count larger than 100"
+)
 
 func RequestFromReader(reader *bufio.Reader) (*Request, error) {
 	count, err := readLength(reader, '*')
 	if err != nil {
 		return nil, err
+	}
+
+	if validateArgumentsCount(count) {
+		return nil, errors.New(invalidArrayCount)
 	}
 
 	command, err := readNext(reader)
@@ -79,4 +87,11 @@ func readNext(reader *bufio.Reader) (string, error) {
 		return "", err
 	}
 	return string(buffer[:size]), err
+}
+
+func validateArgumentsCount(count int) bool {
+	min := 1
+	max := 100
+
+	return count >= min && count <= max
 }

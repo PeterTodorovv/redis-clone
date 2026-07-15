@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"redis/database"
 	"redis/request"
@@ -15,7 +16,7 @@ func main() {
 	db := database.CreateDatabase()
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	defer listener.Close()

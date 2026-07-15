@@ -131,3 +131,7 @@ func TestLPushX(t *testing.T) {
 	assert.Equal(t, 0, length)
 	assert.False(t, ok)
 }
+
+func TestRPop(t *testing.T) {
+
+}
