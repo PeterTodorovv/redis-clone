@@ -15,7 +15,10 @@ const (
 	cmdExists = "EXISTS"
 	cmdEcho   = "ECHO"
 
-	cmdRPush = "RPUSH"
+	cmdRPush  = "RPUSH"
+	cmdLPush  = "LPUSH"
+	cmdRPushX = "RPUSHX"
+	cmdLPushX = "LPUSHX"
 )
 
 const (
@@ -73,6 +76,45 @@ func HandleRequest(r request.Request, db *database.Database) string {
 		}
 
 		added, err := db.RPush(key, values)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		return numberFormat(added)
+
+	case cmdLPush:
+		key, values, err := getKeyValuesArguments(r.GetArgs())
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		added, err := db.LPush(key, values)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		return numberFormat(added)
+
+	case cmdRPushX:
+		key, values, err := getKeyValuesArguments(r.GetArgs())
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		added, err := db.RPushX(key, values)
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		return numberFormat(added)
+
+	case cmdLPushX:
+		key, values, err := getKeyValuesArguments(r.GetArgs())
+		if err != nil {
+			return errorFormat(err.Error())
+		}
+
+		added, err := db.LPushX(key, values)
 		if err != nil {
 			return errorFormat(err.Error())
 		}
